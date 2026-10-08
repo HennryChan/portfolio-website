@@ -36,9 +36,32 @@ export const MIN_MESSAGE_LENGTH = 20;
  */
 export function validateContact(values: ContactValues): ContactField[] {
   const invalid: ContactField[] = [];
-  if (values.name.trim().length < 2) invalid.push("name");
-  if (!EMAIL_PATTERN.test(values.email.trim())) invalid.push("email");
-  if (values.message.trim().length < MIN_MESSAGE_LENGTH) invalid.push("message");
+  const name = values.name.trim();
+  const email = values.email.trim();
+  const message = values.message.trim();
+
+  // Nombre: entre 2 y 70 caracteres, sin enlaces URLs (típico de spam).
+  if (name.length < 2 || name.length > 70 || /(https?:\/\/|www\.)/i.test(name)) {
+    invalid.push("name");
+  }
+
+  // Correo: patrón válido y largo razonable.
+  if (!EMAIL_PATTERN.test(email) || email.length > 100) {
+    invalid.push("email");
+  }
+
+  // Mensaje: entre MIN_MESSAGE_LENGTH y 3000 caracteres, sin etiquetas HTML o exceso de enlaces.
+  const urlMatches = message.match(/(https?:\/\/|www\.)/gi) ?? [];
+  const hasSpamMarkup = /<[a-z][\s\S]*>/i.test(message) || /\[url=/i.test(message);
+  if (
+    message.length < MIN_MESSAGE_LENGTH ||
+    message.length > 3000 ||
+    urlMatches.length > 2 ||
+    hasSpamMarkup
+  ) {
+    invalid.push("message");
+  }
+
   return invalid;
 }
 
@@ -46,19 +69,21 @@ export function validateContact(values: ContactValues): ContactField[] {
  * Lee los campos del formulario sin espacios al inicio ni al final.
  *
  * @param form - El `<form>` que se envió.
- * @returns Los valores y `honeypot`: el campo oculto "company", que una
- * persona nunca ve; si trae texto, el envío viene de un bot.
+ * @returns Los valores y `honeypot`: los campos trampa "company" o "botcheck", que una
+ * persona nunca ve; si traen texto, el envío viene de un bot.
  */
 export function readContactForm(form: HTMLFormElement): ContactValues & {
-  /** Valor del campo trampa "company"; vacío si quien envía es una persona. */
+  /** Valor del campo trampa "company" o "botcheck"; vacío si quien envía es una persona. */
   honeypot: string;
 } {
   const data = new FormData(form);
   const read = (key: string) => String(data.get(key) ?? "").trim();
+  const company = read("company");
+  const botcheck = read("botcheck");
   return {
     name: read("name"),
     email: read("email"),
     message: read("message"),
-    honeypot: read("company"),
+    honeypot: company || botcheck,
   };
 }

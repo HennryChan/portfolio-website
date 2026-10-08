@@ -139,7 +139,15 @@ export function ContactForm({ className }: { className?: string }) {
         );
       })}
 
-      {/* Trampa para bots: invisible para personas y lectores de pantalla. */}
+      {/* Trampa para bots: invisible para personas y lectores de pantalla. Web3Forms lee botcheck. */}
+      <input
+        type="checkbox"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        className="hidden"
+        style={{ display: "none" }}
+      />
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label htmlFor={`${id}-company`}>Company</label>
         <input id={`${id}-company`} name="company" tabIndex={-1} autoComplete="off" />

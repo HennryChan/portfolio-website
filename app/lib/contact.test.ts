@@ -34,4 +34,20 @@ describe("validateContact", () => {
     expect(validateContact({ ...valid, message: short })).toEqual(["message"]);
     expect(validateContact({ ...valid, message: "a".repeat(MIN_MESSAGE_LENGTH) })).toEqual([]);
   });
+
+  it("rechaza nombres o mensajes con patrones de spam (URLs o etiquetas HTML)", () => {
+    expect(validateContact({ ...valid, name: "Bot http://spam.com" })).toEqual(["name"]);
+    expect(
+      validateContact({
+        ...valid,
+        message: "Mira esto: http://link1.com y http://link2.com y http://link3.com",
+      }),
+    ).toEqual(["message"]);
+    expect(
+      validateContact({
+        ...valid,
+        message: 'Hola <a href="http://spam.com">haz clic aquí</a> para ganar dinero.',
+      }),
+    ).toEqual(["message"]);
+  });
 });
