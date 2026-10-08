@@ -7,7 +7,7 @@ import type { SiteConfig } from "./types";
 export const site: SiteConfig = {
   // Si el repo no se llama <usuario>.github.io, agrega su nombre: "https://hennrychan.github.io/<repo>".
   url: "https://hennrychan.github.io",
-  repositoryUrl: "https://github.com/HennryChan/HennryChan.github.io",
+  repositoryUrl: "https://github.com/HennryChan/portfolio-website",
   email: "dev.hennry.chan@gmail.com",
   socials: [
     { label: "GitHub", href: "https://github.com/HennryChan" },
