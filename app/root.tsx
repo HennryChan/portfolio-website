@@ -69,6 +69,19 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta name="theme-color" content="#edf0f3" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {import.meta.env.VITE_GA_MEASUREMENT_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GA_MEASUREMENT_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${import.meta.env.VITE_GA_MEASUREMENT_ID}');`,
+              }}
+            />
+          </>
+        )}
         <Meta />
         <Links />
       </head>
