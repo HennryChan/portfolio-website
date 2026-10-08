@@ -16,7 +16,10 @@ export const site: SiteConfig = {
   contactForm: {
     // Formspree: "https://formspree.io/f/<id>"
     // Web3Forms: "https://api.web3forms.com/submit" + extraFields: { access_key: "<llave>" }
-    endpoint: "",
+    endpoint: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ? "https://api.web3forms.com/submit" : "",
+    extraFields: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+      ? { access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY }
+      : undefined,
   },
   cv: null,
   caseStudy: "portafolio",

@@ -13,9 +13,6 @@
 /playwright-report/
 /.playwright-cli/
 
-# Skills de Claude Code y de Antigravity: son de terceros y se instalan localmente
-/.claude/
-/.agents/skills/
 
 # Capturas de npm run qa:screenshots
 /qa/
