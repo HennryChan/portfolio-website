@@ -1,0 +1,64 @@
+# Revisa (tipos, lint, formato y pruebas) y compila en cada push a main y en cada pull request.
+# Solo los push a main (o una ejecución manual desde main) publican en GitHub Pages.
+name: CI y despliegue
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# pages e id-token: los pide actions/deploy-pages para publicar sin guardar credenciales.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# En main no se cancela un despliegue a medias; en pull requests solo importa la última ejecución.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Revisar y compilar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+
+      # Calcula la ruta base: "/" para <usuario>.github.io, "/<repo>/" para cualquier otro repo.
+      - id: pages
+        uses: actions/configure-pages@v6
+
+      # Incluye scripts/postbuild.mjs: 404.html, sitemap.xml y robots.txt.
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      # build/client es exactamente lo que se publica.
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/client
+
+  deploy:
+    name: Publicar en GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

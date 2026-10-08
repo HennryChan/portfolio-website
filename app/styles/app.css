@@ -1,0 +1,604 @@
+/* Estilos globales: tokens de color por tema, escala tipográfica, la
+   entrada de la portada y los estados que dependen del scroll o del
+   puntero. Lo demás se escribe con utilidades de Tailwind en cada componente. */
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   Tokens
+   Cada capa de una aplicación (interfaz, API, datos, infraestructura)
+   tiene un color propio, que solo aparece donde representa una capa.
+   Aparte, los colores "de sintaxis" (--code-*) marcan siempre el mismo
+   tipo de dato, como en un editor de código.
+   ────────────────────────────────────────────────────────────── */
+
+/* Tema claro (el predeterminado). */
+:root {
+  /* Fondo de la página, tarjetas, campos y paneles elevados, texto y bordes. */
+  --paper: #edf0f3;
+  --surface: #f8f9fb;
+  --raised: #ffffff;
+  --ink: #162033;
+  --ink-soft: #4d586a;
+  --line: #ccd3dc;
+
+  /* Una por capa, de arriba hacia abajo. --ok: estados positivos (disponibilidad). */
+  --layer-ui: #5a4fd8;
+  --layer-api: #0b8f80;
+  --layer-data: #b8770f;
+  --layer-infra: #d2436f;
+  --ok: #1e9e5a;
+
+  /* Colores de sintaxis de VS Code (Light+): mismos roles que en el tema oscuro.
+     --code-tech: nombres de tecnologías (color de "variable").
+     --code-number: fechas y periodos (color de "número").
+     --code-accent: el prompt ">" de la frase del hero y el anillo de foco.
+     --cursor: el cursor de la frase. --button-*: el botón principal. */
+  --code-tech: #001080;
+  --code-number: #098658;
+  --code-accent: #006ab1;
+  --cursor: #162033;
+  --selection: color-mix(in oklab, #5a4fd8 24%, transparent);
+  --button-bg: #162033;
+  --button-fg: #edf0f3;
+  --button-bg-hover: #2c2a6b;
+
+  /* Ilustraciones de proyectos (provisionales hasta tener capturas). --art-l y
+     --art-c: luminosidad y croma OKLCH del acento; el tono lo pone cada proyecto. */
+  --art-bg: #ffffff;
+  --art-panel: #f1f4f8;
+  --art-l: 0.62;
+  --art-c: 0.15;
+  --art-soft-l: 0.93;
+
+  --focus: var(--code-accent);
+  /* Alto de la cabecera fija: las secciones y los anclas lo dejan libre. */
+  --header-h: 4.25rem;
+  /* Controles nativos (barras de scroll, campos) en su versión clara. */
+  color-scheme: light;
+}
+
+/* Modo oscuro: negro de editor, como VS Code y Visual Studio. El color se usa
+   como en el resaltado de sintaxis: pocos tonos suaves, siempre con el mismo
+   significado (tecnologías, fechas, prompt), para que no todo sea texto blanco. */
+:root[data-theme="dark"] {
+  --paper: #141414;
+  --surface: #1c1c1c;
+  --raised: #252526;
+  --ink: #d4d4d4;
+  --ink-soft: #9d9d9d;
+  --line: #2b2b2b;
+
+  --layer-ui: #c586c0;
+  --layer-api: #4ec9b0;
+  --layer-data: #d7ba7d;
+  --layer-infra: #ce9178;
+  --ok: #73c991;
+
+  /* Colores de sintaxis de VS Code (Dark+): cada tipo de dato, siempre el mismo color. */
+  --code-tech: #9cdcfe;
+  --code-number: #b5cea8;
+  --code-accent: #3794ff;
+  --cursor: #aeafad;
+  --selection: #264f78;
+  --button-bg: #0078d4;
+  --button-fg: #ffffff;
+  --button-bg-hover: #026ec1;
+
+  --art-bg: #1f1f1f;
+  --art-panel: #2a2a2a;
+  --art-l: 0.74;
+  --art-c: 0.12;
+  --art-soft-l: 0.34;
+  color-scheme: dark;
+}
+
+/* Sin JavaScript no hay data-theme: se respeta la preferencia del sistema.
+   Mismos valores que el bloque anterior. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --paper: #141414;
+    --surface: #1c1c1c;
+    --raised: #252526;
+    --ink: #d4d4d4;
+    --ink-soft: #9d9d9d;
+    --line: #2b2b2b;
+
+    --layer-ui: #c586c0;
+    --layer-api: #4ec9b0;
+    --layer-data: #d7ba7d;
+    --layer-infra: #ce9178;
+    --ok: #73c991;
+
+    /* Colores de sintaxis de VS Code (Dark+): cada tipo de dato, siempre el mismo color. */
+    --code-tech: #9cdcfe;
+    --code-number: #b5cea8;
+    --code-accent: #3794ff;
+    --cursor: #aeafad;
+    --selection: #264f78;
+    --button-bg: #0078d4;
+    --button-fg: #ffffff;
+    --button-bg-hover: #026ec1;
+
+    --art-bg: #1f1f1f;
+    --art-panel: #2a2a2a;
+    --art-l: 0.74;
+    --art-c: 0.12;
+    --art-soft-l: 0.34;
+    color-scheme: dark;
+  }
+}
+
+/* Los tokens como utilidades de Tailwind (bg-paper, text-ink, text-code-tech…).
+   `inline`: la utilidad usa la variable directamente, así sigue al tema activo. */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-layer-ui: var(--layer-ui);
+  --color-layer-api: var(--layer-api);
+  --color-layer-data: var(--layer-data);
+  --color-layer-infra: var(--layer-infra);
+  --color-ok: var(--ok);
+  --color-code-tech: var(--code-tech);
+  --color-code-number: var(--code-number);
+  --color-code-accent: var(--code-accent);
+}
+
+@theme {
+  /* Mona Sans: la fuente de todo el sitio; su eje de ancho da las utilidades font-wide. */
+  --font-sans: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Cascadia Code: la fuente de Windows Terminal y Visual Studio. Solo para lo que es "código". */
+  --font-mono: "Cascadia Code Variable", "Cascadia Code", ui-monospace, Consolas, monospace;
+
+  /* Escala tipográfica clásica (Bringhurst): 12 14 16 18 21 24 36 48 60 72 */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.3125rem;
+  --text-xl--line-height: 1.5;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 1.15;
+  --text-4xl: 3rem;
+  --text-4xl--line-height: 1.05;
+  --text-5xl: 3.75rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 4.5rem;
+  --text-6xl--line-height: 0.98;
+
+  /* Curvas con más carácter que las de serie. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Base
+   ────────────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    background-color: var(--paper);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    /* Al saltar a un ancla (#projects), la sección queda debajo de la cabecera fija. */
+    scroll-padding-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  /* Texto base de 17 px (18 px en escritorio). */
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-stretch: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (min-width: 64rem) {
+    body {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* Títulos con líneas parejas; párrafos sin una palabra sola en la última línea. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--selection);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+}
+
+/* Contenedor de página: mismo ancho y márgenes en todas las secciones. */
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+
+  @media (min-width: 40rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Destinos de foco programático (secciones): sin anillo de foco. */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tipografía con carácter: Mona Sans tiene eje de ancho (75–125 %)
+   ────────────────────────────────────────────────────────────── */
+
+@utility font-wide {
+  font-stretch: 125%;
+}
+
+@utility font-semiwide {
+  font-stretch: 112%;
+}
+
+/* El nombre se ajusta al ancho de su columna según la palabra más larga. */
+.hero-copy {
+  container-type: inline-size;
+}
+
+.hero-name {
+  font-size: clamp(3rem, var(--name-fit, 15cqi), 8.75rem);
+  font-weight: 800;
+  font-stretch: 125%;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+}
+
+/* Cada línea del nombre recorta lo que sobresale: en la entrada, el nombre
+   "sube" desde su propia línea. El margen deja ver acentos y descendentes. */
+.hero-name-line {
+  display: block;
+  overflow: clip;
+  overflow-clip-margin: 0.1em;
+  padding-block: 0.02em 0.06em;
+}
+
+.hero-name-line > span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Entrada de la portada: un solo momento orquestado al cargar.
+   El script del <head> añade .intro solo en cargas completas,
+   así no se repite al volver desde otra página.
+   ────────────────────────────────────────────────────────────── */
+
+/* El nombre sube y se ensancha (eje de ancho del 75 % al 125 %). */
+@keyframes name-in {
+  from {
+    font-stretch: 75%;
+    transform: translateY(105%);
+  }
+  to {
+    font-stretch: 125%;
+    transform: translateY(0);
+  }
+}
+
+/* El resto del texto sube un poco y se enfoca. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Las placas de la ilustración caen a su lugar. */
+@keyframes plate-in {
+  from {
+    opacity: 0;
+    transform: translateY(-46px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Las etiquetas de las capas se deslizan desde su placa. */
+@keyframes callout-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Retrasos: --i es la línea del nombre, --delay (en ms) lo pone cada elemento
+   del hero y --order es el turno de cada placa, de abajo hacia arriba. */
+@media (prefers-reduced-motion: no-preference) {
+  .intro .hero-name-line > span {
+    animation: name-in 1.15s var(--ease-out) both;
+    animation-delay: calc(120ms + var(--i, 0) * 110ms);
+  }
+
+  .intro [data-intro] {
+    animation: rise-in 800ms var(--ease-out) both;
+    animation-delay: calc(var(--delay, 0) * 1ms);
+  }
+
+  .intro .iso-plate {
+    animation: plate-in 900ms var(--ease-out) both;
+    animation-delay: calc(250ms + var(--order, 0) * 140ms);
+  }
+
+  .intro .iso-callout {
+    animation: callout-in 600ms var(--ease-out) both;
+    animation-delay: calc(650ms + var(--order, 0) * 140ms);
+  }
+}
+
+/* La frase sobre el nombre se descifra con GSAP (HeroHook). Mientras el
+   JavaScript carga queda oculta; si nunca llega, aparece sola a los 2.6 s. */
+@keyframes hook-fallback {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro .hero-hook:not(.is-live) {
+    opacity: 0;
+    animation: hook-fallback 400ms ease 2.6s forwards;
+  }
+}
+
+/* Cursor de bloque al final de la frase, como en una terminal. */
+.hook-caret {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1.05em;
+  margin-left: 0.2ch;
+  vertical-align: -0.15em;
+  background-color: var(--cursor);
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hook-caret {
+    animation: caret-blink 1.1s steps(1, end) infinite;
+  }
+}
+
+/* Caracteres que aún no se descifran: otro color y cifras de ancho fijo. */
+.hook-cipher {
+  color: var(--layer-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Cabecera
+   ────────────────────────────────────────────────────────────── */
+
+/* data-scrolled y data-hidden los pone SiteHeader según el scroll. */
+.site-header {
+  transition:
+    transform 320ms var(--ease-out),
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+
+.site-header[data-scrolled="true"] {
+  background-color: color-mix(in oklab, var(--paper) 84%, transparent);
+  border-color: var(--line);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+}
+
+/* El icono del tema depende del tema activo, sin esperar a React. */
+.theme-icon-moon {
+  display: block;
+}
+.theme-icon-sun {
+  display: none;
+}
+:root[data-theme="dark"] .theme-icon-moon {
+  display: none;
+}
+:root[data-theme="dark"] .theme-icon-sun {
+  display: block;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Botones
+   ────────────────────────────────────────────────────────────── */
+
+.button {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+/* Al pulsar, el botón se encoge un poco: confirma que recibió el toque. */
+.button:active {
+  transform: scale(0.97);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Proyectos: las tarjetas se apilan como capas al hacer scroll
+   ────────────────────────────────────────────────────────────── */
+
+@media (min-width: 64rem) {
+  .project-stack-item {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem + var(--i, 0) * 0.875rem);
+  }
+}
+
+/* Cuando la siguiente tarjeta la cubre, se encoge desde arriba (ver Projects). */
+.project-card {
+  transform-origin: 50% 0;
+}
+
+/* Ilustraciones provisionales de cada proyecto. El acento combina el tono del
+   proyecto (--art-hue) con la luminosidad y el croma del tema. */
+.project-art {
+  --art-accent: oklch(var(--art-l) var(--art-c) var(--art-hue, 250));
+  --art-accent-soft: oklch(var(--art-soft-l) 0.05 var(--art-hue, 250));
+  --art-line: color-mix(in oklab, var(--ink) 14%, transparent);
+  --art-text: color-mix(in oklab, var(--ink) 26%, transparent);
+}
+
+/* Al pasar el puntero por la tarjeta, la captura se eleva y las tres
+   profundidades de la ilustración se separan. */
+.project-art .art-depth-1,
+.project-art .art-depth-2,
+.project-shot {
+  transition: transform 450ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .project-card:hover .project-shot {
+    transform: translateY(-6px);
+  }
+}
+
+.project-art .art-depth-3 {
+  transition: transform 450ms var(--ease-out);
+}
+
+.project-art .art-depth-3 {
+  filter: drop-shadow(0 12px 18px rgb(15 23 42 / 0.16));
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .project-card:hover .art-depth-1 {
+    transform: translate(-3px, -3px);
+  }
+  .project-card:hover .art-depth-2 {
+    transform: translate(-7px, -7px);
+  }
+  .project-card:hover .art-depth-3 {
+    transform: translate(-12px, -12px);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Stack: cada capa se puede "sacar" de la pila al pasar el puntero
+   ────────────────────────────────────────────────────────────── */
+
+/* --layer lo pone StackRow: el color de la capa, o gris en lo transversal. */
+.layer-row {
+  background-color: color-mix(in oklab, var(--layer) 6%, var(--surface));
+  transition:
+    transform 260ms var(--ease-out),
+    background-color 200ms ease;
+}
+
+/* Franja del color de la capa en el borde izquierdo. */
+.layer-row::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  background-color: var(--layer);
+  transition: width 260ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .layer-row:hover {
+    transform: translateX(8px);
+    background-color: color-mix(in oklab, var(--layer) 11%, var(--surface));
+  }
+  .layer-row:hover::before {
+    width: 8px;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Experiencia: la línea se dibuja con el scroll
+   ────────────────────────────────────────────────────────────── */
+
+/* El punto de cada trabajo se rellena al alcanzarlo (clase is-reached, ver Experience). */
+.timeline-dot {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    transform 300ms var(--ease-out);
+}
+
+.timeline-item.is-reached .timeline-dot {
+  background-color: var(--ink);
+  border-color: var(--ink);
+  transform: scale(1.15);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Transiciones entre páginas (View Transitions API)
+   ────────────────────────────────────────────────────────────── */
+
+/* Cambio de página o de tema: un fundido breve. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* La imagen y el título de un proyecto viajan de su tarjeta a su página. */
+::view-transition-group(project-art),
+::view-transition-group(project-title) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-in-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

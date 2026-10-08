@@ -1,0 +1,8 @@
+build/
+.react-router/
+.claude/
+.agents/skills/
+qa/
+node_modules/
+package-lock.json
+skills-lock.json

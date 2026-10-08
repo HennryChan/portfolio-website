@@ -1,0 +1,21 @@
+.DS_Store
+.env
+.env.*
+/node_modules/
+*.log
+
+# React Router
+/.react-router/
+/build/
+
+# Pruebas y herramientas locales
+/test-results/
+/playwright-report/
+/.playwright-cli/
+
+# Skills de Claude Code y de Antigravity: son de terceros y se instalan localmente
+/.claude/
+/.agents/skills/
+
+# Capturas de npm run qa:screenshots
+/qa/
